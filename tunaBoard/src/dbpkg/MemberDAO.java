@@ -191,4 +191,49 @@ public class MemberDAO {
 		System.out.println("modifyIn [end]");
 
 	}
+	
+	public static ArrayList<MemberVO> sale() {
+
+		ArrayList<MemberVO> vo = new ArrayList<MemberVO>();
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		String sql = " select a.cust_no,a.CUST_NAME, "
+				+ " sum(b.price),max(b.PRICE) "
+				+ " from MEMBER_TBL_02 a"
+				+ " inner join MONEY_TBL_02 b "
+				+ " on a.CUST_NO = b.CUSTNO "
+				+ " GROUP BY a.CUST_NO ,a.CUST_NAME"
+				+ " ORDER BY a.CUST_NO " ;
+
+		try {
+			con = DBConn.getConnection();
+			ps = con.prepareStatement(sql);
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+
+				int custno = rs.getInt(1);
+
+				String custname = rs.getString(2);
+				String phone = rs.getString(3);
+				String address = rs.getString(4);
+				String joindate = rs.getString(5);
+				String grade = rs.getString(6);
+				String city = rs.getString(7);
+
+				vo.add(new MemberVO(custno, custname, phone, address, joindate,
+						grade, city));
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			DBConn.close(con, ps, rs);
+		}
+		System.out.println("getMaxCustNo [end]");
+
+		return vo;
+	}
 }
